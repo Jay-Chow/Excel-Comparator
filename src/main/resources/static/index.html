@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Comparator</title>
+</head>
+<body>
+<h2>Compare Two Excel Files</h2>
+<form id="compareForm" enctype="multipart/form-data">
+    <label>Correct File:</label>
+    <input type="file" name="correctExcel" required><br><br>
+
+    <label>File to Verify:</label>
+    <input type="file" name="toVerifyFile" required><br><br>
+
+    <button type="submit">Compare</button>
+</form>
+
+<h3>Comparison Result:</h3>
+<ul id="results"></ul>
+
+<script>
+    document.getElementById('compareForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch('/api/compare', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(data => {
+                const resultList = document.getElementById('results');
+                resultList.innerHTML = '';
+
+                if (data.length === 0) {
+                    resultList.innerHTML = '<li>No mismatches found. ✅</li>';
+                } else {
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        resultList.appendChild(li);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('An error occurred during comparison.');
+            });
+    });
+</script>
+</body>
+</html>
